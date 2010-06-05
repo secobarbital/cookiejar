@@ -170,6 +170,11 @@ describe CookieValidation do
         CookieValidation.effective_host(value).should == value
       end
     end
+    it "should leave blank domains blank" do
+      ['', nil].each do |value|
+        CookieValidation.effective_host(value).should == ''
+      end
+    end
     it "should handle a URI object" do
       CookieValidation.effective_host(URI.parse('http://example.com/')).should == 'example.com'
     end	
@@ -202,6 +207,13 @@ describe CookieValidation do
     it "should not match superdomains, or illegal domains" do
       CookieValidation.domains_match('.z.foo.com', 'x.y.z.foo.com').should be_nil
       CookieValidation.domains_match('foo.com', 'com').should be_nil
+    end
+    it "should not match blank domains" do
+      CookieValidation.domains_match('.foo.com', '').should be_nil
+      CookieValidation.domains_match('.foo.com', nil).should be_nil
+      CookieValidation.domains_match('', 'foo.com').should be_nil
+      CookieValidation.domains_match('', '').should be_nil
+      CookieValidation.domains_match('', nil).should be_nil
     end
     it "should not match domains with and without a dot suffix together" do
       CookieValidation.domains_match('foo.com.', 'foo.com').should be_nil

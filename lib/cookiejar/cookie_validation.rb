@@ -78,7 +78,7 @@ module CookieJar
       elsif uri_or_domain.is_a? Cookie
         uri_or_domain.domain
       else
-        uri_or_domain
+        uri_or_domain || ''
       end
     end
     
@@ -92,7 +92,7 @@ module CookieJar
       base = effective_host base_domain
       search_domains = compute_search_domains_for_host base
       result = search_domains.find do |domain| 
-        domain == tested_domain  
+        domain == tested_domain unless domain.empty?
       end
     end
     
@@ -213,7 +213,7 @@ module CookieJar
       hostname = to_domain host_or_uri
       hostname = hostname.downcase
     
-      if /.[\.:]./.match(hostname) || hostname == '.local'
+      if /.[\.:]./.match(hostname) || hostname == '.local' || hostname.empty?
         hostname
       else
         hostname + '.local'
