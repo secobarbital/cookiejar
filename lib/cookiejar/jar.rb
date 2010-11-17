@@ -1,4 +1,5 @@
 require 'cookiejar/cookie'
+require 'addressable/uri'
  
 module CookieJar
   # A cookie store for client side usage. 
@@ -289,7 +290,7 @@ module CookieJar
     end
   
     def to_uri request_uri
-      (request_uri.is_a? URI)? request_uri : (URI.parse request_uri)
+      Addressable::URI.parse request_uri
     end
     
     def find_domain host

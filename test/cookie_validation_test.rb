@@ -96,6 +96,9 @@ describe CookieValidation do
     it "should handle URI objects" do
       CookieValidation.cookie_base_path(URI.parse('http://www.foo.com/bar/')).should == '/bar/'
     end
+    it "should handle Addressable URI objects" do
+      CookieValidation.cookie_base_path(Addressable::URI.parse('http://www.foo.com/bar/')).should == '/bar/'
+    end
     it "should preserve case" do
       CookieValidation.cookie_base_path("/BaR/").should == '/BaR/'
     end
@@ -107,6 +110,9 @@ describe CookieValidation do
     end
     it "should handle URI objects" do
       CookieValidation.determine_cookie_path(URI.parse('http://foo.com/bar/'), '').should == '/bar/'
+    end
+    it "should handle Addressable URI objects" do
+      CookieValidation.determine_cookie_path(Addressable::URI.parse('http://foo.com/bar/'), '').should == '/bar/'
     end
     it "should handle Cookie objects" do
       cookie = Cookie.from_set_cookie('http://foo.com/', "name=value;path=/")

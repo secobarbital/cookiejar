@@ -156,10 +156,10 @@ module CookieJar
       # being sent over http, and it must not be a http_only cookie sent to
       # a script
       path_match   = uri.path.start_with? @path
-      secure_match = !(@secure && uri.scheme == 'http') 
+      secure_match = !(@secure && uri.scheme.downcase == 'http') 
       script_match = !(script && @http_only)
       expiry_match = !expired?
-      ports_match = ports.nil? || (ports.include? uri.port)
+      ports_match = ports.nil? || (ports.include? uri.port || uri.inferred_port)
       path_match && secure_match && script_match && expiry_match && ports_match
     end
     

@@ -1,5 +1,7 @@
 require 'cgi'
+require 'addressable/uri'
 require 'uri'
+
 module CookieJar
   # Represents a set of cookie validation errors
   class InvalidCookieError < StandardError
@@ -51,7 +53,7 @@ module CookieJar
     # @param [String, URI] request_uri URI we are normalizing
     # @param [URI] URI representation of input string, or original URI
     def self.to_uri request_uri
-      (request_uri.is_a? URI)? request_uri : (URI.parse request_uri)
+      Addressable::URI.parse request_uri
     end
     
     # Converts an input cookie or uri to a string representing the path.
@@ -60,7 +62,7 @@ module CookieJar
     # @param [String, URI, Cookie] object containing the path
     # @return [String] path information
     def self.to_path uri_or_path
-      if (uri_or_path.is_a? URI) || (uri_or_path.is_a? Cookie)
+      if (uri_or_path.is_a? URI) || (uri_or_path.is_a? Addressable::URI) || (uri_or_path.is_a? Cookie)
         uri_or_path.path
       else
         uri_or_path
@@ -73,7 +75,7 @@ module CookieJar
     # @param [String, URI, Cookie] object containing the domain
     # @return [String] domain information.
     def self.to_domain uri_or_domain
-      if uri_or_domain.is_a? URI
+      if (uri_or_domain.is_a? URI) || (uri_or_domain.is_a? Addressable::URI)
         uri_or_domain.host
       elsif uri_or_domain.is_a? Cookie
         uri_or_domain.domain
@@ -231,7 +233,7 @@ module CookieJar
       uri = to_uri request_uri
       request_host = effective_host uri.host
       request_path = uri.path
-      request_secure = (uri.scheme == 'https')
+      request_secure = (uri.scheme.downcase == 'https')
       cookie_host = cookie.domain
       cookie_path = cookie.path
       
@@ -270,7 +272,7 @@ module CookieJar
       # The Port attribute has a "port-list", and the request-port was
       # not in the list.
       unless cookie.ports.nil? || cookie.ports.length != 0
-        unless cookie.ports.find_index uri.port
+        unless cookie.ports.find_index uri.port || uri.inferred_port
           errors << "Ports list does not contain request URI port"
         end
       end
